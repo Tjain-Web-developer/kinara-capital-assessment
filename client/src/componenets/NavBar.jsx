@@ -13,6 +13,7 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { TextField, Tooltip } from "@mui/material";
+import { useState } from "react";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -57,29 +58,51 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function NavBar() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [rollAnchor, setRollAnchor] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [rollAnchor, setRollAnchor] = useState(null);
+  const [nameAnchor, setNameAnchor] = useState(null);
+  const [inpLabel, setInpLabel] = useState({});
 
   const open = Boolean(anchorEl);
   const rollOpen = Boolean(rollAnchor);
+  const nameOpen = Boolean(nameAnchor);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleRollClick = (event) => {
+  const handleRollClick = (event, str) => {
     setRollAnchor(event.currentTarget);
+    setInpLabel(str);
   };
+  const handleNameClick = (event, str) => {
+    setNameAnchor(event.currentTarget);
+    setInpLabel(str);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
   const handleRollClose = () => {
     setRollAnchor(null);
   };
+  const handleNameClose = () => {
+    setNameAnchor(null);
+  };
+
+  const [filterData, setFilterData] = useState({});
 
   const changeHandler = (e) => {
-    console.log(e.target.value);
+    setFilterData({...filterData, [e.target.name]: e.target.value})
   }
 
+  const submitHandler = (e) => {
+    console.log(filterData)
+  }
+
+  const clearFilters = () => {
+    setFilterData({});
+  }
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -119,15 +142,15 @@ export default function NavBar() {
                 "aria-labelledby": "basic-button",
               }}
               position="relative"
-              style={{ overflow: "auto" }}
             >
-              <MenuItem onClick={handleRollClick}>Roll Number</MenuItem>
-              <MenuItem onClick={handleClose}>Student Name</MenuItem>
-              <MenuItem onClick={handleClose}>Total Marks</MenuItem>
-              <MenuItem onClick={handleClose}>Gender</MenuItem>
-              <MenuItem onClick={handleClose}>Branch</MenuItem>
-              <MenuItem onClick={handleClose}>Course</MenuItem>
-              <MenuItem onClick={handleClose}>Section</MenuItem>
+              {Object.keys(filterData).length !== 0 && <MenuItem onClick={clearFilters} >Clear Filters</MenuItem>}
+              <MenuItem onClick={(e) => handleRollClick(e,{label: 'Roll Number',name: 'rollNumber'})}>Roll Number</MenuItem>
+              <MenuItem onClick={(e) => handleNameClick(e,{label: 'Student Name',name: 'stdName'})}>Student Name</MenuItem>
+              <MenuItem onClick={(e) => handleRollClick(e,{label: 'Total Marks',name: 'totalMarks'})}>Total Marks</MenuItem>
+              <MenuItem onClick={(e) => handleNameClick(e,{label: 'Gender',name: 'gender'})}>Gender</MenuItem>
+              <MenuItem onClick={(e) => handleNameClick(e,{label: 'Branch',name: 'branch'})}>Branch</MenuItem>
+              <MenuItem onClick={(e) => handleNameClick(e,{label: 'Course',name: 'course'})}>Course</MenuItem>
+              <MenuItem onClick={(e) => handleNameClick(e,{label: 'Section',name: 'section'})}>Section</MenuItem>
               <Menu
                 id="basic-menu"
                 anchorEl={rollAnchor}
@@ -143,30 +166,61 @@ export default function NavBar() {
                   display: "flex",
                   flexDirection: "row",
                   padding: "1em",
-                  flexGrow: '1'
+                  flexGrow: '1',
                 }}
               >
                 <TextField
                   id="standard-select-currency"
                   select
                   label="Select"
-                  defaultValue="<="
+                  defaultValue="&lt="
                   variant="standard"
                   name="compare"
                   style={{ margin: "0 20px" }}
                   onChange={changeHandler}
+                  required
                 >
                   <MenuItem value="&lt=">&lt;=</MenuItem>
                   <MenuItem value="&gt=">&gt;=</MenuItem>
                 </TextField>
                 <TextField
                   id="standard-basic"
-                  label="Roll Number"
+                  type="number"
+                  label={inpLabel.label}
                   variant="standard"
-                  name="rollNumber"
+                  name={inpLabel.name}
                   onChange={changeHandler}
                 />
-                <Button>Submit</Button>
+                <Button onClick={submitHandler} >Submit</Button>
+              </Menu>
+              <Menu
+                id="basic-menu"
+                anchorEl={nameAnchor}
+                open={nameOpen}
+                onClose={handleNameClose}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+                style={{
+                  position: "absolute",
+                  left: "-10%",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  padding: "1em",
+                  flexGrow: '1',
+                }}
+              >
+                <TextField
+                  id="standard-basic"
+                  label={inpLabel.label}
+                  variant="standard"
+                  value={filterData.name}
+                  name={inpLabel.name}
+                  style={{ margin: "0 20px" }}
+                  onChange={changeHandler}
+                />
+                <Button onClick={submitHandler} >Submit</Button>
               </Menu>
             </Menu>
           </div>
