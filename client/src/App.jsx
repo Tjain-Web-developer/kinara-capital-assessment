@@ -1,5 +1,4 @@
 import React from "react";
-import StudentTable from "./componenets/StudentTable";
 import NavBar from "./componenets/NavBar";
 import StudentTab from "./componenets/StudentTab";
 import { useState } from "react";
