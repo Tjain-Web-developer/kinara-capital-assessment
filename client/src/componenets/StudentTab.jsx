@@ -1,26 +1,31 @@
-import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import PaginationCpt from './PaginationCpt';
+import * as React from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import PaginationCpt from "./PaginationCpt";
+import { fetchStudents } from "../services/indexServices";
+import { useEffect } from "react";
+import { useState } from "react";
 
-const rows = [
-    { id: 1, fullName: 'Aman Ratrey', gender: 'male', course: 'B.tech', totalMarks: 419 , section: 'C', branch: 'CSE', rollNumber: 35 },
-    { id: 2, fullName: 'Mangesh Poojan', gender: 'male', course: 'B.tech', totalMarks: 376 , section: 'A', branch: 'Civil', rollNumber: 42 },
-    { id: 3, fullName: 'Palak Shukla', gender: 'female', course: 'B.tech', totalMarks: 1000 , section: 'C', branch: 'Mechanical', rollNumber: 45 },
-    { id: 4, fullName: 'Neeraj Yadav', gender: 'male', course: 'B.tech', totalMarks: 490 , section: 'C', branch: 'Mechanical', rollNumber: 16 },
-    { id: 5, fullName: 'Harji Gidwani', gender: 'male', course: 'B.tech', totalMarks: 355 , section: 'B', branch: 'CSE', rollNumber: 40 },
-    { id: 6, fullName: 'Aparna Ramesh', gender: 'female', course: 'B.tech', totalMarks: 480 , section: 'A', branch: 'CSE', rollNumber: 150 },
-    { id: 7, fullName: 'Esha Khare', gender: 'female', course: 'B.tech', totalMarks: 476 , section: 'B', branch: 'Civil', rollNumber: 44 },
-    { id: 8, fullName: 'Nihit Jain', gender: 'male', course: 'B.tech', totalMarks: 485 , section: 'B', branch: 'CSE', rollNumber: 36 },
-    { id: 9, fullName: 'Yshovardhan Gwaleyy', gender: 'male', course: 'B.tech', totalMarks: 495 , section: 'A', branch: 'CSE', rollNumber: 65 },
-]
+export default function StudentTab({finalData,setFinalData}) {
 
-export default function StudentTab() {
+  const [count,setCount] = useState(0);
+  useEffect(() => {
+    const asyncFetch = async () => {
+      try {
+        let response = await fetchStudents();
+        setCount(response?.data?.students?.length);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    asyncFetch();
+  }, []);
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="caption table">
@@ -37,13 +42,13 @@ export default function StudentTab() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
+          {finalData.map((row, i) => (
+            <TableRow key={row._id}>
               <TableCell component="th" scope="row">
-                {row.id}
+                {i + 1}
               </TableCell>
               <TableCell align="right">{row.rollNumber}</TableCell>
-              <TableCell align="right">{row.fullName}</TableCell>
+              <TableCell align="right">{row.Name}</TableCell>
               <TableCell align="right">{row.totalMarks}</TableCell>
               <TableCell align="right">{row.gender}</TableCell>
               <TableCell align="right">{row.branch}</TableCell>
@@ -53,7 +58,7 @@ export default function StudentTab() {
           ))}
         </TableBody>
       </Table>
-      <PaginationCpt/>
+      <PaginationCpt count={count} setFinalData={setFinalData}/>
     </TableContainer>
   );
 }

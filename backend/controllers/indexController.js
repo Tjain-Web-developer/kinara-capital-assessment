@@ -6,7 +6,8 @@ exports.homePage = async (req, res) => {
 
 exports.createStudents = async (req, res) => {
  try{
-  const data = [
+  let data;
+   data = [
     {
       Name: "Gaurav Garg",
       gender: "male",
@@ -64,7 +65,7 @@ exports.createStudents = async (req, res) => {
 
 exports.viewStudents = async(req,res) =>{
  try{
-  const size = req.query.size || 5;
+  const size = req.query.size || 0;
   const page = req.query.page || 1;
 
   let allStudents = await StudentModel.find()
@@ -79,7 +80,19 @@ exports.viewStudents = async(req,res) =>{
 }
 
 exports.filterStudents = async(req,res)=>{
-  const {gender,course,branch,totalMarks,rollNumber,section} = req.query;
+  
+  const {rollNumberData,marksData} = req.query;
+  console.log(marksData);
+  let students = [];
+  if(rollNumberData.compare&&rollNumberData.rollNumber){
+ 
+    students = await StudentModel.find({rollNumber:{[rollNumberData.compare]:rollNumberData.rollNumber}});
 
-
+  }
+  else if(marksData.compare&&marksData.totalMarks){
+    students = await StudentModel.find({totalMarks:{[marksData.compare]:marksData.totalMarks}});
+  
+  }
+ 
+  res.status(201).json({message:"Successfully fetched documents",students:students})
 }

@@ -13,6 +13,9 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { TextField, Tooltip } from "@mui/material";
+import { useState } from "react";
+import { filterStudents } from "../services/indexServices";
+import { fetchStudents } from "../services/indexServices";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -56,18 +59,31 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function NavBar() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [rollAnchor, setRollAnchor] = React.useState(null);
+export default function NavBar({finalData,setFinalData}) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [rollAnchor, setRollAnchor] = useState(null);
+  const [marksAnchor, setMarksAnchor] = useState(null);
+  //filtering useState
 
+  const [rollNumberFilter, setRollNumberFilter] = useState({
+    compare: "",
+    rollNumber: "",
+  });
+  const [marksFilter, setMarksFilter] = useState({
+    compare: "",
+    totalMarks: "",
+  });
   const open = Boolean(anchorEl);
   const rollOpen = Boolean(rollAnchor);
-
+  const marksOpen = Boolean(marksAnchor)
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleRollClick = (event) => {
     setRollAnchor(event.currentTarget);
+  };
+  const handleMarksClick = (event) => {
+    setMarksAnchor(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -76,10 +92,32 @@ export default function NavBar() {
     setRollAnchor(null);
   };
 
+  const handleMarksClose = () => {
+    setMarksAnchor(null);
+  };
+
   const changeHandler = (e) => {
-    console.log(e.target.value);
+    console.log(e.target.name, e.target.value);
+    setRollNumberFilter({
+      ...rollNumberFilter,
+      [e.target.name]: e.target.value,
+    });
+    setMarksFilter({
+      ...marksFilter,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleClearFilterClick = async()=>{
+    let response = await fetchStudents()
+    setFinalData(response?.data?.students)
+
   }
 
+  const submitHandler = async (e) => {
+    let response = await filterStudents({rollNumberData:rollNumberFilter,marksData:marksFilter})
+    setFinalData(response?.data?.students);
+  };
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -121,13 +159,12 @@ export default function NavBar() {
               position="relative"
               style={{ overflow: "auto" }}
             >
+              <MenuItem onClick={handleClearFilterClick}>Clear Filter</MenuItem>
               <MenuItem onClick={handleRollClick}>Roll Number</MenuItem>
-              <MenuItem onClick={handleClose}>Student Name</MenuItem>
-              <MenuItem onClick={handleClose}>Total Marks</MenuItem>
-              <MenuItem onClick={handleClose}>Gender</MenuItem>
-              <MenuItem onClick={handleClose}>Branch</MenuItem>
-              <MenuItem onClick={handleClose}>Course</MenuItem>
-              <MenuItem onClick={handleClose}>Section</MenuItem>
+              
+              <MenuItem onClick={handleMarksClick}>Total Marks</MenuItem>
+              
+             
               <Menu
                 id="basic-menu"
                 anchorEl={rollAnchor}
@@ -143,7 +180,7 @@ export default function NavBar() {
                   display: "flex",
                   flexDirection: "row",
                   padding: "1em",
-                  flexGrow: '1'
+                  flexGrow: "1",
                 }}
               >
                 <TextField
@@ -156,17 +193,59 @@ export default function NavBar() {
                   style={{ margin: "0 20px" }}
                   onChange={changeHandler}
                 >
-                  <MenuItem value="&lt=">&lt;=</MenuItem>
-                  <MenuItem value="&gt=">&gt;=</MenuItem>
+                  <MenuItem value="$lte">&lt;=</MenuItem>
+                  <MenuItem value="$gte">&gt;=</MenuItem>
                 </TextField>
                 <TextField
                   id="standard-basic"
                   label="Roll Number"
                   variant="standard"
                   name="rollNumber"
+                  type="number"
                   onChange={changeHandler}
                 />
-                <Button>Submit</Button>
+                <Button onClick={submitHandler}>Submit</Button>
+              </Menu>
+              <Menu
+                id="basic-menu"
+                anchorEl={marksAnchor}
+                open={marksOpen}
+                onClose={handleMarksClose}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+                style={{
+                  position: "absolute",
+                  left: "-10%",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  padding: "1em",
+                  flexGrow: "1",
+                }}
+              >
+                <TextField
+                  id="standard-select-currency"
+                  select
+                  label="Select"
+                  defaultValue="<="
+                  variant="standard"
+                  name="compare"
+                  style={{ margin: "0 20px" }}
+                  onChange={changeHandler}
+                >
+                  <MenuItem value="$lte">&lt;=</MenuItem>
+                  <MenuItem value="$gte">&gt;=</MenuItem>
+                </TextField>
+                <TextField
+                  id="standard-basic"
+                  label="Total Marks"
+                  variant="standard"
+                  name="totalMarks"
+                  type="number"
+                  onChange={changeHandler}
+                />
+                <Button onClick={submitHandler}>Submit</Button>
               </Menu>
             </Menu>
           </div>
