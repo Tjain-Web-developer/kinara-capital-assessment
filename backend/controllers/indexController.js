@@ -64,7 +64,7 @@ exports.createStudents = async (req, res) => {
 
 exports.viewStudents = async(req,res) =>{
  try{
-  const size = req.query.size || 5;
+  const size = req.query.size || 0;
   const page = req.query.page || 1;
 
   let allStudents = await StudentModel.find()

@@ -3,13 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var cors = require('cors')
 var indexRouter = require('./routes/index');
 const { connectDB } = require('./database/database');
 
 
 var app = express();
-
+app.use(cors({origin:"http://127.0.0.1:5173"}))
 connectDB();
 
 app.use(logger('dev'));
