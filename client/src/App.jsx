@@ -1,10 +1,9 @@
 import React from "react";
 import StudentTable from "./componenets/StudentTable";
 import NavBar from "./componenets/NavBar";
-import StdTable from "./componenets/StdTable";
 import StudentTab from "./componenets/StudentTab";
 
-const App = () => {
+const App = () => {``
   return (
     <div>
       <NavBar/>
